@@ -248,6 +248,28 @@ config REGULATOR_TPS6507X
 	  three step-down converters and two general-purpose LDO voltage regulators.
 	  It supports TI's software based Class-2 SmartReflex implementation.
 
+config REGULATOR_ACT8846
+	tristate "Active Semi ACT8846 PMIC regulators"
+	depends on I2C
+	help
+	  Support the voltage and current regulators of the ACT8846 series of PMIC devices.
+
+config ACT8846_SUPPORT_RESET
+	tristate "ACT8846 PMIC SUPPORT RESET"
+	depends on REGULATOR_ACT8846=y
+	help
+	  Support short press key to restart.
+
+config RK29_PWM_REGULATOR
+	tristate "rk2918 pwm voltage regulator"
+	help
+	  Say Y to enable support for the voltage regulators charge on the RK2918.
+
+config RK30_PWM_REGULATOR
+	tristate "rk30 pwm voltage regulator for discrete dcdc or ldo"
+	help
+	  Say Y to enable support for the voltage regulators control on the RK30 .
+
 config REGULATOR_88PM8607
 	bool "Marvell 88PM8607 Power regulators"
 	depends on MFD_88PM860X=y
