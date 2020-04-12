@@ -432,6 +432,28 @@ config GPIO_UCB1400
 	  To compile this driver as a module, choose M here: the
 	  module will be called ucb1400_gpio.
 
+config EXPANDED_GPIO_NUM  
+	int "setting the amount of expanded gpios"
+	help
+	  for tca6424, set 24
+	
+config EXPANDED_GPIO_IRQ_NUM
+	int "setting the amount of expanded gpio irqs"
+	help
+	  for tca6424, set 24
+
+config SPI_FPGA_GPIO_NUM  
+	default 96
+	int "setting the amount of fpga gpios"
+	help
+	  for fpga, set 96,no used ,set 0
+	
+config SPI_FPGA_GPIO_IRQ_NUM
+	default 16
+	int "setting the amount of fpga gpio irqs"
+	help
+	  for fpga, set 16,no used ,set 0	
+
 comment "MODULbus GPIO expanders:"
 
 config GPIO_JANZ_TTL
