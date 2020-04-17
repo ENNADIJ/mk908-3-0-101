@@ -50,10 +50,17 @@ static DEFINE_MUTEX(core_lock);
 static DEFINE_IDR(i2c_adapter_idr);
 
 static struct device_type i2c_client_type;
+static int i2c_check_addr(struct i2c_adapter *adapter, int addr);
+static int i2c_check_addr_ex(struct i2c_adapter *adapter, int addr);
 static int i2c_detect(struct i2c_adapter *adapter, struct i2c_driver *driver);
 
 /* ------------------------------------------------------------------------- */
 
+#ifdef CONFIG_I2C_DEV_RK29
+extern struct completion		i2c_dev_complete;
+extern void i2c_dev_dump_start(struct i2c_adapter *adap, struct i2c_msg *msgs, int num);
+extern void i2c_dev_dump_stop(struct i2c_adapter *adap, struct i2c_msg *msgs, int num, int ret);
+#endif
 static const struct i2c_device_id *i2c_match_id(const struct i2c_device_id *id,
 						const struct i2c_client *client)
 {
@@ -518,6 +525,7 @@ i2c_new_device(struct i2c_adapter *adap, struct i2c_board_info const *info)
 	client->flags = info->flags;
 	client->addr = info->addr;
 	client->irq = info->irq;
+	client->udelay = info->udelay;  // add by kfx
 
 	strlcpy(client->name, info->type, sizeof(client->name));
 
@@ -558,6 +566,141 @@ out_err_silent:
 	return NULL;
 }
 EXPORT_SYMBOL_GPL(i2c_new_device);
+#ifdef CONFIG_PLAT_RK
+#define RK610_KEY       "rk610"
+static int __i2c_client_print(struct device *dev, void *param)
+{
+        struct i2c_client *client = i2c_verify_client(dev);
+
+        if(client)
+                printk(KERN_WARNING "client: %s, addr: 0x%x\n", client->name, client->addr);
+        return 0;
+}
+static int __i2c_check_rk610_ex(struct device *dev, void *ex)
+{
+        struct i2c_client *client = i2c_verify_client(dev);
+
+        if(!client)
+                return 0;
+
+        if(strstr(client->name, RK610_KEY) != NULL)
+                *(int *)ex += 1 << 8;
+        else
+                *(int *)ex += 1;
+        return 0;
+}
+int i2c_check_rk610_ex(int nr)
+{
+        int ex = 0, rk610_ex = 0, oth_ex = 0;
+        struct i2c_adapter *adap = i2c_get_adapter(nr);
+
+        if(!adap){
+                printk(KERN_ERR "%s: adap(%d) is not exist\n", __func__, nr);
+                return -EINVAL;
+        }
+        device_for_each_child(&adap->dev, &ex, __i2c_check_rk610_ex);
+
+        if(ex & (1 << 8))
+                rk610_ex = 1;
+
+        oth_ex = ex & 0xff;
+
+        if(rk610_ex && oth_ex){
+                ex = 1;
+                printk(KERN_WARNING "******************* WARNING ********************\n");
+                dev_warn(&adap->dev, "%s is exist, clients:\n", RK610_KEY);
+                device_for_each_child(&adap->dev, NULL, __i2c_client_print);
+                printk(KERN_WARNING "************************************************\n");
+        }
+        else 
+                ex = 0;
+        return ex;
+}
+#ifdef CONFIG_I2C_RK30
+int i2c_add_device(int nr, struct i2c_board_info const *info)
+{
+	int			status;
+	struct i2c_client	*client;
+        struct i2c_adapter *adap = i2c_get_adapter(nr);
+        
+        if(!adap){
+                printk(KERN_ERR "%s: adap(%d) is not exist\n", __func__, nr);
+                return -EINVAL;
+        }
+
+	client = kzalloc(sizeof *client, GFP_KERNEL);
+	if (!client){
+                dev_err(&adap->dev, "no memory for client\n");
+		return -ENOMEM;
+        }
+
+	client->adapter = adap;
+
+	client->dev.platform_data = info->platform_data;
+
+	if (info->archdata)
+		client->dev.archdata = *info->archdata;
+
+	client->flags = info->flags;
+	client->addr = info->addr;
+	client->irq = info->irq;
+	client->udelay = info->udelay;  // add by kfx
+
+	strlcpy(client->name, info->type, sizeof(client->name));
+
+	/* Check for address validity */
+	status = i2c_check_client_addr_validity(client);
+	if (status) {
+		dev_err(&adap->dev, "Invalid %d-bit I2C address 0x%02hx\n",
+			client->flags & I2C_CLIENT_TEN ? 10 : 7, client->addr);
+		goto out_err_silent;
+	}
+
+	/* Check for address business */
+	status = i2c_check_addr_busy(adap, client->addr);
+	if (status){
+                status = -EEXIST;
+		dev_warn(&adap->dev, "i2c clients have been registered at 0x%02x\n", client->addr);   
+		goto out_err_silent;
+        }
+
+	client->dev.parent = &client->adapter->dev;
+	client->dev.bus = &i2c_bus_type;
+	client->dev.type = &i2c_client_type;
+	client->dev.of_node = info->of_node;
+
+        dev_set_name(&client->dev, "%d-%04x", i2c_adapter_id(adap),
+    		     client->addr);
+    
+	status = device_register(&client->dev);
+	if (status)
+		goto out_err;
+
+	dev_dbg(&adap->dev, "client [%s] registered with bus id %s\n",
+		client->name, dev_name(&client->dev));
+
+	return 0;
+
+out_err:
+	dev_err(&adap->dev, "Failed to register i2c client %s at 0x%02x "
+		"(%d)\n", client->name, client->addr, status);
+out_err_silent:
+	kfree(client);
+	return status;
+}
+#else
+int i2c_check_rk610_ex(int nr)
+{
+        return 0;
+}
+int i2c_add_device(int nr, struct i2c_board_info const *info)
+{
+        return 0;
+}
+#endif
+EXPORT_SYMBOL_GPL(i2c_check_rk610_ex);
+EXPORT_SYMBOL_GPL(i2c_add_device);
+#endif
 
 
 /**
@@ -1255,6 +1398,9 @@ static int __init i2c_init(void)
 	retval = i2c_add_driver(&dummy_driver);
 	if (retval)
 		goto class_err;
+#ifdef CONFIG_I2C_DEV_RK29
+		init_completion(&i2c_dev_complete);
+#endif
 	return 0;
 
 class_err:
@@ -1358,6 +1504,115 @@ int i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 }
 EXPORT_SYMBOL(i2c_transfer);
 
+#ifdef CONFIG_PLAT_RK
+int i2c_master_normal_send(const struct i2c_client *client, const char *buf, int count, int scl_rate)
+{
+	int ret;
+	struct i2c_adapter *adap=client->adapter;
+	struct i2c_msg msg;
+
+	msg.addr = client->addr;
+	msg.flags = client->flags;
+	msg.len = count;
+	msg.buf = (char *)buf;
+	msg.scl_rate = scl_rate;
+	msg.udelay = client->udelay;
+
+	ret = i2c_transfer(adap, &msg, 1);
+	return (ret == 1) ? count : ret;
+}
+EXPORT_SYMBOL(i2c_master_normal_send);
+
+int i2c_master_normal_recv(const struct i2c_client *client, char *buf, int count, int scl_rate)
+{
+	struct i2c_adapter *adap=client->adapter;
+	struct i2c_msg msg;
+	int ret;
+
+	msg.addr = client->addr;
+	msg.flags = client->flags | I2C_M_RD;
+	msg.len = count;
+	msg.buf = (char *)buf;
+	msg.scl_rate = scl_rate;
+	msg.udelay = client->udelay;
+
+	ret = i2c_transfer(adap, &msg, 1);
+
+	return (ret == 1) ? count : ret;
+}
+EXPORT_SYMBOL(i2c_master_normal_recv);
+int i2c_master_reg8_send(const struct i2c_client *client, const char reg, const char *buf, int count, int scl_rate)
+{
+	struct i2c_adapter *adap=client->adapter;
+	struct i2c_msg msg;
+	int ret;
+	char *tx_buf = (char *)kmalloc(count + 1, GFP_KERNEL);
+	if(!tx_buf)
+		return -ENOMEM;
+	tx_buf[0] = reg;
+	memcpy(tx_buf+1, buf, count); 
+
+	msg.addr = client->addr;
+	msg.flags = client->flags;
+	msg.len = count + 1;
+	msg.buf = (char *)tx_buf;
+	msg.scl_rate = scl_rate;
+	msg.udelay = client->udelay;
+
+	ret = i2c_transfer(adap, &msg, 1);
+	kfree(tx_buf);
+	return (ret == 1) ? count : ret;
+
+}
+EXPORT_SYMBOL(i2c_master_reg8_send);
+
+int i2c_master_reg8_recv(const struct i2c_client *client, const char reg, char *buf, int count, int scl_rate)
+{
+	struct i2c_adapter *adap=client->adapter;
+	struct i2c_msg msgs[2];
+	int ret;
+	char reg_buf = reg;
+	
+	msgs[0].addr = client->addr;
+	msgs[0].flags = client->flags;
+	msgs[0].len = 1;
+	msgs[0].buf = &reg_buf;
+	msgs[0].scl_rate = scl_rate;
+	msgs[0].udelay = client->udelay;
+
+	msgs[1].addr = client->addr;
+	msgs[1].flags = client->flags | I2C_M_RD;
+	msgs[1].len = count;
+	msgs[1].buf = (char *)buf;
+	msgs[1].scl_rate = scl_rate;
+	msgs[1].udelay = client->udelay;
+
+	ret = i2c_transfer(adap, msgs, 2);
+
+	return (ret == 2)? count : ret;
+}
+
+EXPORT_SYMBOL(i2c_master_reg8_recv);
+
+#ifdef CONFIG_PLAT_RK
+int i2c_master_send(const struct i2c_client *client, const char *buf, int count)
+{
+	int ret;
+	struct i2c_adapter *adap=client->adapter;
+	struct i2c_msg msg;
+
+	msg.addr = client->addr;
+	msg.flags = client->flags;
+	msg.len = count;
+	msg.buf = (char *)buf;
+	msg.scl_rate = 100 * 1000;
+	msg.udelay = client->udelay;
+
+	ret = i2c_transfer(adap, &msg, 1);
+	return (ret == 1) ? count : ret;
+}
+EXPORT_SYMBOL(i2c_master_send);
+#else
 /**
  * i2c_master_send - issue a single I2C message in master transmit mode
  * @client: Handle to slave device
@@ -1384,7 +1639,29 @@ int i2c_master_send(const struct i2c_client *client, const char *buf, int count)
 	return (ret == 1) ? count : ret;
 }
 EXPORT_SYMBOL(i2c_master_send);
+#endif
 
+
+#ifdef CONFIG_PLAT_RK
+int i2c_master_recv(const struct i2c_client *client, char *buf, int count)
+{
+	struct i2c_adapter *adap=client->adapter;
+	struct i2c_msg msg;
+	int ret;
+
+	msg.addr = client->addr;
+	msg.flags = client->flags | I2C_M_RD;
+	msg.len = count;
+	msg.buf = (char *)buf;
+	msg.scl_rate = 100 * 1000;
+	msg.udelay = client->udelay;
+
+	ret = i2c_transfer(adap, &msg, 1);
+
+	return (ret == 1) ? count : ret;
+}
+EXPORT_SYMBOL(i2c_master_recv);
+#else
 /**
  * i2c_master_recv - issue a single I2C message in master receive mode
  * @client: Handle to slave device
@@ -1412,7 +1689,8 @@ int i2c_master_recv(const struct i2c_client *client, char *buf, int count)
 	return (ret == 1) ? count : ret;
 }
 EXPORT_SYMBOL(i2c_master_recv);
-
+#endif
+#endif
 /* ----------------------------------------------------
  * the i2c address scanning function
  * Will not work for 10-bit addresses!
@@ -1920,8 +2198,8 @@ static s32 i2c_smbus_xfer_emulated(struct i2c_adapter *adapter, u16 addr,
 	unsigned char msgbuf0[I2C_SMBUS_BLOCK_MAX+3];
 	unsigned char msgbuf1[I2C_SMBUS_BLOCK_MAX+2];
 	int num = read_write == I2C_SMBUS_READ ? 2 : 1;
-	struct i2c_msg msg[2] = { { addr, flags, 1, msgbuf0 },
-	                          { addr, flags | I2C_M_RD, 0, msgbuf1 }
+	struct i2c_msg msg[2] = { { addr, flags, 1, msgbuf0, 100000, 0, 0 },
+	                          { addr, flags | I2C_M_RD, 0, msgbuf1, 100000, 0, 0 }
 	                        };
 	int i;
 	u8 partial_pec = 0;

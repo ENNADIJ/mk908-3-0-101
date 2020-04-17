@@ -115,6 +115,9 @@ static void gic_eoi_irq(struct irq_data *d)
 	}
 
 	writel_relaxed(gic_irq(d), gic_cpu_base(d) + GIC_CPU_EOI);
+#ifdef CONFIG_PLAT_RK
+	dsb();
+#endif
 }
 
 static int gic_set_type(struct irq_data *d, unsigned int type)
@@ -203,6 +206,9 @@ static int gic_set_wake(struct irq_data *d, unsigned int on)
 {
 	int ret = -ENXIO;
 
+#ifdef CONFIG_PLAT_RK
+	return 0;
+#endif
 	if (gic_arch_extn.irq_set_wake)
 		ret = gic_arch_extn.irq_set_wake(d, on);
 

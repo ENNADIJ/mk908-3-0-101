@@ -43,6 +43,7 @@ struct act8846_platform_data {
 
 void __sramfunc board_pmu_act8846_suspend(void);
 void __sramfunc board_pmu_act8846_resume(void);
+int regulator_set_suspend_voltage(struct regulator *regulator, int uV);
 
 #endif
 
