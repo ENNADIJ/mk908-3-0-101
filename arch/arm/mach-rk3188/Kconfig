@@ -26,6 +26,7 @@ config MACH_RK3188_DS1006H
 
 config MACH_RK3188_BOX
 	bool "RK3188 box board"
+	select SMP
 	
 endchoice
 

@@ -120,7 +120,7 @@ CHECKFLAGS	+= -D__arm__
 
 #Default value
 head-y		:= arch/arm/kernel/head$(MMUEXT).o arch/arm/kernel/init_task.o
-textofs-y	:= 0x00008000
+textofs-y	:= 0x00408000
 textofs-$(CONFIG_ARCH_CLPS711X) := 0x00028000
 # We don't want the htc bootloader to corrupt kernel during resume
 textofs-$(CONFIG_PM_H1940)      := 0x00108000
@@ -171,8 +171,6 @@ machine-$(CONFIG_ARCH_ORION5X)		:= orion5x
 machine-$(CONFIG_ARCH_PNX4008)		:= pnx4008
 machine-$(CONFIG_ARCH_PXA)		:= pxa
 machine-$(CONFIG_ARCH_REALVIEW)		:= realview
-#machine-$(CONFIG_ARCH_RK29)   		:= rk29
-#machine-$(CONFIG_ARCH_RK2928)		:= rk2928
 machine-$(CONFIG_ARCH_RK30)		:= rk30
 machine-$(CONFIG_ARCH_RK3188)		:= rk3188
 machine-$(CONFIG_ARCH_RPC)		:= rpc
