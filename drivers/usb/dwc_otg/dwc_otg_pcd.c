@@ -2064,7 +2064,7 @@ void dwc_otg_pcd_remove( struct device *dev )
  * then a host may connect again, or the driver might get unbound.
  *
  * @param _driver The driver being registered
- */
+ * /
  
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
 int usb_gadget_probe_driver(struct usb_gadget_driver *_driver,
@@ -2101,7 +2101,7 @@ int usb_gadget_register_driver(struct usb_gadget_driver *_driver)
 		return -EBUSY;
 	}
 	
-	/* hook up the driver */
+	/* hook up the driver * /
 	s_pcd->driver = _driver;
 	s_pcd->gadget.dev.driver = &_driver->driver;
 
@@ -2133,7 +2133,7 @@ EXPORT_SYMBOL(usb_gadget_register_driver);
  * This function unregisters a gadget driver
  *
  * @param _driver The driver being unregistered
- */
+ * /
 int usb_gadget_unregister_driver(struct usb_gadget_driver *_driver)
 {
 	DWC_DEBUGPL(DBG_PCDV,"%s(%p)\n", __func__, _driver);
@@ -2158,5 +2158,5 @@ int usb_gadget_unregister_driver(struct usb_gadget_driver *_driver)
 					_driver->driver.name);
 	return 0;
 }
-EXPORT_SYMBOL(usb_gadget_unregister_driver);
+EXPORT_SYMBOL(usb_gadget_unregister_driver);*/
 #endif /* DWC_HOST_ONLY */

@@ -388,7 +388,7 @@ void dwc_otg_force_device(dwc_otg_core_if_t *core_if)
     	printk("dwc_otg_force_device,already in B_PERIPHERAL,everest\n");
     	return;
     }
-	hub_disconnect_device(g_root_hub20);
+//	hub_disconnect_device(g_root_hub20);
     otg_dev->core_if->op_state = B_PERIPHERAL;
 	/* Reset the Controller */
 	dwc_otg_core_reset( core_if );

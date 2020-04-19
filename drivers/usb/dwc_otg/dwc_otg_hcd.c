@@ -656,11 +656,12 @@ static void dwc_otg_hcd_enable(struct work_struct *work)
 	        goto out;
 	    }
 	    DWC_PRINT("%s, disable host controller\n", __func__);
-	    #if 1
+	    #if 0
         if (_core_if->hcd_cb && _core_if->hcd_cb->disconnect) {
                 _core_if->hcd_cb->disconnect( _core_if->hcd_cb->p );
         }
         #endif
+		pldata->soft_reset();
         dwc_otg_disable_host_interrupts( _core_if );
         //if (_core_if->hcd_cb && _core_if->hcd_cb->stop) {
         //        _core_if->hcd_cb->stop( _core_if->hcd_cb->p );
@@ -677,6 +678,8 @@ static void dwc_otg_hcd_enable(struct work_struct *work)
         if(pldata->phy_suspend) 
             pldata->phy_suspend( pldata, USB_PHY_ENABLED);
         mdelay(5);
+		dwc_otg_core_init(_core_if);
+		dwc_otg_enable_global_interrupts(_core_if);
         if (_core_if->hcd_cb && _core_if->hcd_cb->start) {
                 _core_if->hcd_cb->start( _core_if->hcd_cb->p );
         }

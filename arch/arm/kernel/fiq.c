@@ -47,10 +47,6 @@
 #include <asm/system.h>
 #include <asm/traps.h>
 
-#ifndef FIQ_START
-#define FIQ_START 0
-#endif
-
 static unsigned long no_fiq_insn;
 
 /* Default reacquire function
