@@ -137,7 +137,7 @@
 
 #endif  //#ifdef CONFIG_VIDEO_RK29
 /*---------------- Camera Sensor Configuration Macro End------------------------*/
-// #include "../../../drivers/media/video/rk30_camera.c"
+#include "../../../drivers/media/video/rk30_camera.c"
 /*---------------- Camera Sensor Macro Define End  ---------*/
 
 #define PMEM_CAM_SIZE PMEM_CAM_NECESSARY

@@ -1782,6 +1782,7 @@ static void dwc_otg_pcd_check_vbus_timer( unsigned long data )
          {
             DWC_PRINT("********vbus detect*********************************************\n");
     	    _pcd->vbus_status = 1;
+                goto connect;
             if(_pcd->conn_en)
                 goto connect;
             else if( pldata->phy_status == USB_PHY_ENABLED )
@@ -2158,5 +2159,5 @@ int usb_gadget_unregister_driver(struct usb_gadget_driver *_driver)
 					_driver->driver.name);
 	return 0;
 }
-EXPORT_SYMBOL(usb_gadget_unregister_driver);*/
+EXPORT_SYMBOL(usb_gadget_unregister_driver); */
 #endif /* DWC_HOST_ONLY */
