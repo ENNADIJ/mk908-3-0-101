@@ -1800,7 +1800,7 @@ static void dwc_otg_pcd_check_vbus_timer( unsigned long data )
         }
         else if(_pcd->conn_status ==3)
         {
-			//*连接不上时释放锁，允许系统进入二级睡眠，yk@rk,20100331*//
+			//*\C1\AC\BD硬\BB\C9\CF时\CA头\C5\CB\F8\A3\AC\D4\CA\D0\ED系统\BD\F8\C8\EB\B6\FE\BC\B6睡\C3撸\ACyk@rk,20100331*//
             dwc_otg_msc_unlock(_pcd);
             _pcd->conn_status++;
             if((dwc_read_reg32((uint32_t*)((uint8_t *)_pcd->otg_dev->base + DWC_OTG_HOST_PORT_REGS_OFFSET))&0xc00) == 0xc00)
@@ -2065,7 +2065,7 @@ void dwc_otg_pcd_remove( struct device *dev )
  * then a host may connect again, or the driver might get unbound.
  *
  * @param _driver The driver being registered
- * /
+ */
  
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
 int usb_gadget_probe_driver(struct usb_gadget_driver *_driver,
@@ -2102,7 +2102,7 @@ int usb_gadget_register_driver(struct usb_gadget_driver *_driver)
 		return -EBUSY;
 	}
 	
-	/* hook up the driver * /
+	/* hook up the driver */
 	s_pcd->driver = _driver;
 	s_pcd->gadget.dev.driver = &_driver->driver;
 
@@ -2134,7 +2134,7 @@ EXPORT_SYMBOL(usb_gadget_register_driver);
  * This function unregisters a gadget driver
  *
  * @param _driver The driver being unregistered
- * /
+ */
 int usb_gadget_unregister_driver(struct usb_gadget_driver *_driver)
 {
 	DWC_DEBUGPL(DBG_PCDV,"%s(%p)\n", __func__, _driver);
@@ -2159,5 +2159,5 @@ int usb_gadget_unregister_driver(struct usb_gadget_driver *_driver)
 					_driver->driver.name);
 	return 0;
 }
-EXPORT_SYMBOL(usb_gadget_unregister_driver); */
+EXPORT_SYMBOL(usb_gadget_unregister_driver);
 #endif /* DWC_HOST_ONLY */

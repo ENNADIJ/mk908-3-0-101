@@ -9,7 +9,7 @@
 
 static irqreturn_t usb_detect_irq_handler(int irq, void *dev_id);
 static int detect_gpio = INVALID_GPIO;
-extern void rk28_send_wakeup_key(void);
+//extern void rk28_send_wakeup_key(void);
 
 static void usb_detect_do_wakeup(struct work_struct *work)
 {
@@ -17,7 +17,7 @@ static void usb_detect_do_wakeup(struct work_struct *work)
 	int irq = gpio_to_irq(detect_gpio);
 	unsigned int type;
 
-	rk28_send_wakeup_key();
+	//rk28_send_wakeup_key();
 	type = gpio_get_value(detect_gpio) ? IRQ_TYPE_EDGE_FALLING : IRQ_TYPE_EDGE_RISING;
 	ret = irq_set_irq_type(irq, type);
 	if (ret < 0) {
@@ -102,7 +102,7 @@ static irqreturn_t bvalid_irq_handler(int irq, void *dev_id)
 
 #ifdef CONFIG_RK_USB_DETECT_BY_OTG_BVALID
 	wake_lock_timeout(&usb_wakelock, WAKE_LOCK_TIMEOUT);
-	rk28_send_wakeup_key();
+	//rk28_send_wakeup_key();
 #endif
 
 	return IRQ_HANDLED;

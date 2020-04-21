@@ -1,6 +1,16 @@
 #!/bin/sh
-
 [ -d /dev ] || mkdir -m 0755 /dev
+
+insmod ./g_serial.ko
+insmod ./rkwifi.ko.3.0.72+
+
+echo BOOTING ...
+
+insmod ./font.ko
+insmod ./softcursor.ko
+insmod ./bitblit.ko
+insmod ./fbcon.ko
+
 [ -d /root ] || mkdir -m 0700 /root
 [ -d /sys ] || mkdir /sys
 [ -d /proc ] || mkdir /proc
@@ -13,18 +23,8 @@ mount -t proc -o nodev,noexec,nosuid proc /proc
 # Some things don't work properly without /etc/mtab.
 ln -sf /proc/mounts /etc/mtab
 
-
-insmod ./g_dbgp.ko
-
-sleep 5
-
-insmod ./font.ko
-insmod ./softcursor.ko
-insmod ./bitblit.ko
-insmod ./fbcon.ko
-
 echo BOOTING ...
-sleep 5
+
 
 grep -q '\<quiet\>' /proc/cmdline || echo "Loading, please wait..."
 

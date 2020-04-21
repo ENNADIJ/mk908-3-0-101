@@ -92,6 +92,7 @@ config DWC_OTG_DEBUG
 config DWC_REMOTE_WAKEUP
 	bool "remote wakeup support in DWC_OTG controller"
 	depends on USB11_HOST || USB20_HOST || USB20_OTG
+
 config DWC_OTG
 	tristate	
 	default y if USB11_HOST || USB20_HOST || USB20_OTG
