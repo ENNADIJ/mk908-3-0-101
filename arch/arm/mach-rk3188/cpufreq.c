@@ -579,7 +579,7 @@ static unsigned int cpufreq_scale_limit(unsigned int target_freq, struct cpufreq
 		if (boottime_ms > 60 * MSEC_PER_SEC) {
 			is_booting = false;
 		} else if (target_freq > low_battery_freq &&
-			   0 /*rk_get_system_battery_capacity()*/ <= low_battery_capacity) {
+			   false && 0 /*rk_get_system_battery_capacity()*/ <= low_battery_capacity) {
 			target_freq = low_battery_freq;
 		}
 	}

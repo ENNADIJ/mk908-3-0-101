@@ -263,7 +263,7 @@ void usb20otg_power_enable(int enable)
     if(1 == enable)//enable
     {
         gpio_set_value(RK3066B_OTG_DRV_VBUS, GPIO_HIGH); 
-    }   
+    }
 }
 #endif
 struct dwc_otg_platform_data usb20otg_pdata = {
