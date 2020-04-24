@@ -297,12 +297,12 @@ typedef enum GPIOIntType {
 	GPIOEdgelRising
 }eGPIOIntType_t;
 
-// static inline bool gpio_is_valid(int number)
-// {
-// 	return number >= PIN_BASE && number < ARCH_NR_GPIOS;
-// }
+static inline bool gpio_is_valid(int number)
+{
+	return number >= PIN_BASE && number < ARCH_NR_GPIOS;
+}
 
-// #define gpio_is_valid gpio_is_valid
+#define gpio_is_valid gpio_is_valid
 
 extern void __init rk30_gpio_init(void);
 

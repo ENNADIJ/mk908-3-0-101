@@ -1782,6 +1782,7 @@ static void dwc_otg_pcd_check_vbus_timer( unsigned long data )
          {
             DWC_PRINT("********vbus detect*********************************************\n");
     	    _pcd->vbus_status = 1;
+                goto connect;
             if(_pcd->conn_en)
                 goto connect;
             else if( pldata->phy_status == USB_PHY_ENABLED )
@@ -1799,7 +1800,7 @@ static void dwc_otg_pcd_check_vbus_timer( unsigned long data )
         }
         else if(_pcd->conn_status ==3)
         {
-			//*连接不上时释放锁，允许系统进入二级睡眠，yk@rk,20100331*//
+			//*\C1\AC\BD硬\BB\C9\CF时\CA头\C5\CB\F8\A3\AC\D4\CA\D0\ED系统\BD\F8\C8\EB\B6\FE\BC\B6睡\C3撸\ACyk@rk,20100331*//
             dwc_otg_msc_unlock(_pcd);
             _pcd->conn_status++;
             if((dwc_read_reg32((uint32_t*)((uint8_t *)_pcd->otg_dev->base + DWC_OTG_HOST_PORT_REGS_OFFSET))&0xc00) == 0xc00)
