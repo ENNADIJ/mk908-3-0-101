@@ -280,3 +280,7 @@ static void __exit cleanup(void)
 	gserial_cleanup();
 }
 module_exit(cleanup);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Rockchip");
+

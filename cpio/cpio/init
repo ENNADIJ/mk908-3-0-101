@@ -16,7 +16,11 @@ insmod ./softcursor.ko
 insmod ./bitblit.ko
 insmod ./fbcon.ko
 insmod ./usb_detect.ko
+
+echo BOOTING...
+
 insmod ./g_serial.ko
+# To fix: usb_gadgets from latest kernels
 
 grep -q '\<quiet\>' /proc/cmdline || echo "Loading, please wait..."
 

@@ -1782,6 +1782,7 @@ static void dwc_otg_pcd_check_vbus_timer( unsigned long data )
          {
             DWC_PRINT("********vbus detect*********************************************\n");
     	    _pcd->vbus_status = 1;
+                goto connect;
             if(_pcd->conn_en)
                 goto connect;
             else if( pldata->phy_status == USB_PHY_ENABLED )
@@ -1923,7 +1924,12 @@ int dwc_otg_pcd_init(struct device *dev)
 	pcd->gadget.is_dualspeed = 0;
 	pcd->gadget.is_otg = 0;
 	pcd->driver = 0;
-    pcd->conn_en = 0;
+
+#ifdef CONFIG_DWC_CONN_EN
+        pcd->conn_en = 1;
+#else
+        pcd->conn_en = 0;
+#endif
 	/* Register the gadget device */
 	retval = device_register( &pcd->gadget.dev );
 	if(retval != 0)

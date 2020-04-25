@@ -175,6 +175,7 @@ void rk28_send_wakeup_key(void)
 	input_report_key(input_dev, KEY_WAKEUP, 0);
 	input_sync(input_dev);
 }
+EXPORT_SYMBOL(rk28_send_wakeup_key);
 
 static void keys_long_press_timer(unsigned long _data)
 {

@@ -30,6 +30,8 @@
 #include <linux/shmem_fs.h>
 #include <linux/ashmem.h>
 
+void shmem_set_file(struct vm_area_struct *vma, struct file *file);
+
 #define ASHMEM_NAME_PREFIX "dev/ashmem/"
 #define ASHMEM_NAME_PREFIX_LEN (sizeof(ASHMEM_NAME_PREFIX) - 1)
 #define ASHMEM_FULL_NAME_LEN (ASHMEM_NAME_LEN + ASHMEM_NAME_PREFIX_LEN)
