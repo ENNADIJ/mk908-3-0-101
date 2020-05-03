@@ -567,11 +567,11 @@ recycle:
 	 */
 	if (!list_empty(queue) && tty) {
 		if (!test_bit(TTY_THROTTLED, &tty->flags)) {
-			if (do_push)
+			//if (do_push)
 				tasklet_schedule(&port->push);
-			else
-				pr_warning(PREFIX "%d: RX not scheduled?\n",
-					port->port_num);
+			//else
+				//pr_warning(PREFIX "%d: RX not scheduled?\n",
+					//port->port_num);
 		}
 	}
 
