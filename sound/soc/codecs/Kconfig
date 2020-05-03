@@ -386,3 +386,12 @@ config SND_SOC_WM2000
 
 config SND_SOC_WM9090
 	tristate
+
+config SND_SOC_RK2928
+	tristate
+	depends on ARCH_RK2928
+	
+##$_rbox_$_modify_$_zhengyang_begin$_20120704
+config SND_SOC_RK_HDMI_CODEC
+	tristate
+##$_rbox_$_modify_$_zhengyang_end$_20120704

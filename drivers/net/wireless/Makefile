@@ -1,6 +1,7 @@
 #
 # Makefile for the Linux Wireless network device drivers.
 #
+obj-y += wifi_sys/rkwifi_sys_iface.o
 
 obj-$(CONFIG_IPW2100) += ipw2x00/
 obj-$(CONFIG_IPW2200) += ipw2x00/
@@ -25,6 +26,9 @@ obj-$(CONFIG_ZD1211RW)		+= zd1211rw/
 obj-$(CONFIG_RTL8180)		+= rtl818x/
 obj-$(CONFIG_RTL8187)		+= rtl818x/
 obj-$(CONFIG_RTLWIFI)		+= rtlwifi/
+obj-$(CONFIG_MT7601)	+= rkusbwifi/
+obj-$(CONFIG_RTL8812AU) += rtl8812AU_8821AU_linux/
+obj-$(CONFIG_RKWIFI)   += rkwifi/
 
 # 16-bit wireless PCMCIA client drivers
 obj-$(CONFIG_PCMCIA_RAYCS)	+= ray_cs.o

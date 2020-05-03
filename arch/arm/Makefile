@@ -120,7 +120,7 @@ CHECKFLAGS	+= -D__arm__
 
 #Default value
 head-y		:= arch/arm/kernel/head$(MMUEXT).o arch/arm/kernel/init_task.o
-textofs-y	:= 0x00408000
+textofs-y	:= 0x00008000
 textofs-$(CONFIG_ARCH_CLPS711X) := 0x00028000
 # We don't want the htc bootloader to corrupt kernel during resume
 textofs-$(CONFIG_PM_H1940)      := 0x00108000
@@ -128,6 +128,10 @@ textofs-$(CONFIG_PM_H1940)      := 0x00108000
 ifeq ($(CONFIG_ARCH_SA1100),y)
 textofs-$(CONFIG_SA1111) := 0x00208000
 endif
+ifeq ($(CONFIG_PLAT_RK),y)
+textofs-$(CONFIG_PLAT_RK) := 0x00408000
+endif
+
 
 # Machine directory name.  This list is sorted alphanumerically
 # by CONFIG_* macro name.

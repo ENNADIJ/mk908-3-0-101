@@ -17,6 +17,11 @@ menuconfig WLAN
 
 if WLAN
 
+config RKWIFI
+	bool "Rockchip Wifi devices"
+	depends on NETDEVICES
+	default y
+
 config PCMCIA_RAYCS
 	tristate "Aviator/Raytheon 2.4GHz wireless support"
 	depends on PCMCIA
@@ -285,5 +290,49 @@ source "drivers/net/wireless/wl1251/Kconfig"
 source "drivers/net/wireless/wl12xx/Kconfig"
 source "drivers/net/wireless/zd1211rw/Kconfig"
 source "drivers/net/wireless/mwifiex/Kconfig"
+source "drivers/net/wireless/rkwifi/Kconfig"
+
+choice	
+	depends on RKWIFI && CFG80211
+	prompt "Select the wifi module"
+	default RK903
+	
+	config BCM4330 
+    	bool "BCM4330"
+    	depends on RKWIFI && CFG80211
+
+	config RK903
+    	bool "RK903"
+	    depends on RKWIFI && CFG80211
+
+	config RK901
+    	bool "RK901"
+	    depends on RKWIFI && CFG80211
+	
+	config AP6181
+		bool "AP6181"
+		depends on RKWIFI && CFG80211
+
+	config AP6210
+		bool "AP6210"
+		depends on RKWIFI && CFG80211
+
+	config AP6330
+		bool "AP6330"
+		depends on RKWIFI && CFG80211
+
+	config AP6476
+		bool "AP6476"
+		depends on RKWIFI && CFG80211
+
+	config AP6493
+		bool "AP6493"
+		depends on RKWIFI && CFG80211
+
+	config GB86302I
+		bool "GB86302I"
+		depends on RKWIFI && CFG80211
+
+endchoice
 
 endif # WLAN
